@@ -1,338 +1,478 @@
-as2
 //q1
-bool compare (string s1, string s2) {
-    if (s1.size() == s2.size()) {
-        for (int i=0; i<s1.size(); i++) {
-            if (s1[i] == s2[i]) continue;
-            else {
-                return (s1[i] < s2[i]);
-            }
-        }
-    } else {
-        return (s1.size() < s2.size());
-    }
-    return true;
-}
-
-void merge (string *arr, int l1, int r1, int l2, int r2){
-    int Lsize = r1-l1+1, Rsize = r2-l2+1;
-    string L[Lsize], R[Rsize];
-    for (int i=l1; i<=r1; i++) L[i-l1] = arr[i];
-    for (int i=l2; i<=r2; i++) R[i-l2] = arr[i];
-
-    int lit = 0, rit = 0, arrit = l1;
-    while (lit < Lsize && rit < Rsize) {
-        if (compare(L[lit], R[rit])) {
-            arr[arrit++] = L[lit++];
-        } else {
-            arr[arrit++] = R[rit++];
-        }
-    }
-    if (lit == Lsize) {
-        while (rit < Rsize){
-            arr[arrit++] = R[rit++];
-        }
-    }
-    else if (rit == Rsize) {
-        while (lit < Lsize) {
-            arr[arrit++] = L[lit++];
-        }
-    }
-    return;
-}
-
-void mergesort(string *arr, int l ,int r){
-    if (l < r) {
-        int mid = (l+r)/2;
-        mergesort(arr, l, mid); mergesort(arr, mid+1, r);
-        merge(arr, l, mid, mid+1, r);
-    }
-}
-
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
 using namespace std;
-#define ll long long
-#include "functions.h"
+typedef long long ll;
+
+int convert(string a) {
+    return stoi(a);
+}
+
+struct node {
+    int info;
+    node* next;
+};
+
+void add(node *head, int data) {
+    node *temp = new node(); node *cur = head;
+    temp->next = nullptr;
+    temp->info = data;
+    while (cur->next != nullptr) {
+        cur = cur->next;
+    }
+    cur->next = temp;
+}
+
+void printMiddle (node *head, int n) {
+    node *cur = head;
+    for (int i=0; i<n/2; i++) {
+        cur = cur->next;
+    }
+    cout << cur->info << "\n";
+}
 
 
 int main() {
-    int n; cin >> n;
-    string arr[n];
-    for (string &i : arr) cin >> i;
-
-    mergesort(arr, 0, n-1); 
-    for (string i : arr) cout << i << " ";
-    cout << "\n";
+    node* head = nullptr;
+    string i; int j, n=0;
+    while (true) {
+        cin >> i;
+        if (i == "#") break;
+        else {
+            j = convert(i);
+            if (n==0) {
+                head = new node();
+                head->info = j; head->next = nullptr;
+            } else {
+            add(head, j);
+            }
+            n++;
+        }
+    }
+    printMiddle(head, n);
     return 0;
 }
 
 //q2
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-#define ll long long
+typedef long long ll;
 
-bool compare (string s11, string s12, string s21, string s22) {
-    if (s12 == s22){
-        int l =0; 
-        while (l < s11.size() && l < s21.size()){
-            if (s11[l] == s21[l]) {l++;}
-            else {
-                return (s11[l] < s21[l]);
-            }
-        }
-        return (s11.size() < s21.size());
-    } else {
-        int l = 0;
-        while (l < s12.size() && l < s22.size()){
-            if (s12[l] == s22[l]) {l++;}
-            else {
-                return (s12[l] < s22[l]);
-            }
-        }
-        return (s12.size() < s22.size());
-    }
-
+int convert(string a) {
+    return stoi(a);
 }
 
-void merge (string *arr, string *arr2, int l1, int r1, int l2, int r2){
-    int Lsize = r1-l1+1, Rsize = r2-l2+1;
-    string L[Lsize], R[Rsize]; string L2[Lsize], R2[Rsize];
+struct node {
+    int info;
+    node* next;
+};
 
-    for (int i=l1; i<=r1; i++) {L[i-l1] = arr[i]; L2[i-l1] = arr2[i];}
-    for (int i=l2; i<=r2; i++) {R[i-l2] = arr[i]; R2[i-l2] = arr2[i];}
-
-    int lit = 0, rit = 0, arrit = l1;
-    while (lit < Lsize && rit < Rsize) {
-        if (compare(L[lit], L2[lit], R[rit], R2[rit])) {
-            arr[arrit] = L[lit]; arr2[arrit++] = L2[lit++];
-        } else {
-            arr[arrit] = R[rit]; arr2[arrit++] = R2[rit++];
-        }
+void add(node *head, int data) {
+    node *temp = new node(); node *cur = head;
+    temp->next = nullptr;
+    temp->info = data;
+    while (cur->next != nullptr) {
+        cur = cur->next;
     }
-    if (lit == Lsize) {
-        while (rit < Rsize){
-            arr[arrit] = R[rit]; arr2[arrit++] = R2[rit++];
-        }
-    }
-    else if (rit == Rsize) {
-        while (lit < Lsize) {
-            arr[arrit] = L[lit]; arr2[arrit++] = L2[lit++];
-        }
-    }
-    return;
-}
-
-void mergesort(string *arr, string *arr2, int l ,int r){
-    if (l < r) {
-        int mid = (l+r)/2;
-        mergesort(arr, arr2, l, mid); mergesort(arr, arr2, mid+1, r);
-        merge(arr, arr2, l, mid, mid+1, r);
-    }
+    cur->next = temp;
 }
 
 int main() {
-    int n; cin >> n;
-    string name[n], dept[n];
-    for (int i=0; i<n; i++) cin >> name[i] >> dept[i];
-
-    mergesort(name, dept, 0, n-1);
-
-    for (int i=0; i<n; i++) {
-        cout << name[i] <<  " " << dept[i] << "\n";
+    node* head = nullptr;
+    string i; int j;
+    int numMax = -1, maxFreq = 0;
+    while (true) {
+        cin >> i;
+        if (i == "#") break;
+        else {
+            j = convert(i);
+            if (head == nullptr) {
+                head = new node();
+                head->info = j; head->next = nullptr;
+            } else {
+                add(head, j);
+            }
+        }
     }
+
+    node *cur = head; int curNum = 0 , curFreq = 0;
+    while (cur != nullptr) {
+        curNum = cur->info;
+        while (cur != nullptr && cur->info == curNum) {
+            curFreq++;
+            cur = cur->next;
+        }
+        if (curFreq == maxFreq) {numMax = max(numMax, curNum);}
+        else if (maxFreq < curFreq){
+            maxFreq = curFreq; numMax = curNum;
+        }
+        curFreq = 0;
+    }
+    cout << numMax << "\n";
     return 0;
 }
 
 //q3
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-#define ll long long
+typedef long long ll;
+
+int convert(string a) {
+    return stoi(a);
+}
+
+struct node {
+    int info;
+    node* next;
+};
+
+void add(node *head, int data) {
+    node *temp = new node(); node *cur = head;
+    temp->next = nullptr;
+    temp->info = data;
+    while (cur->next != nullptr) {
+        cur = cur->next;
+    }
+    cur->next = temp;
+    return;
+}
+
+void printList(node* head) {
+    node* cur = head;
+    while (cur != nullptr) {
+        cout << cur->info << " ";
+        cur = cur->next;
+    }
+}
 
 int main() {
-    int n, a; cin >> n;
-    int arr[3] = {0, 0, 0};
-    for (int i=0; i<n; i++) {
-        cin >> a; arr[a]++;
+    node *head = nullptr;
+    string i; int j;
+    int numMax = -1, maxFreq = 0, n=0;
+    while (true) {
+        cin >> i;
+        if (i == "#") break;
+        else {
+            j = convert(i);
+            if (head == nullptr) {
+                head = new node();
+                head->info = j; head->next = nullptr; 
+            } else {
+                add(head, j);
+            }
+            n++;
+        }
     }
-    
-    while(arr[0]--) cout << 0 << " ";
-    while(arr[1]--) cout << 1 << " ";
-    while(arr[2]--) cout << 2 << " ";
+    node* prev = nullptr; node* cur = head;
+    while (cur != nullptr) {
+        node* temp = cur->next;
+        cur->next = prev;
+        prev = cur;    
+        cur = temp;            
+    }
+    head = prev;
+
+    printList(head);
     cout << "\n";
     return 0;
 }
 
 //q4
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-#define ll long long
+typedef long long ll;
 
-void merge (int *arr, int l1, int r1, int l2, int r2){
-    int Lsize = r1-l1+1, Rsize = r2-l2+1;
-    int L[Lsize], R[Rsize];
-    for (int i=l1; i<=r1; i++) L[i-l1] = arr[i];
-    for (int i=l2; i<=r2; i++) R[i-l2] = arr[i];
+int convert(string a) {
+    return stoi(a);
+}
 
-    int lit = 0, rit = 0, arrit = l1;
-    while (lit < Lsize && rit < Rsize) {
-        if (L[lit] < R[rit]) {
-            arr[arrit++] = L[lit++];
-        } else {
-            arr[arrit++] = R[rit++];
-        }
+struct node {
+    int info;
+    node* next;
+    node* prev;
+};
+
+void add(node *head, int data) {
+    node *temp = new node(); node *cur = head;
+    temp->next = nullptr;
+    temp->info = data;
+    while (cur->next != nullptr) {
+        cur = cur->next;
     }
-    if (lit == Lsize) {
-        while (rit < Rsize){
-            arr[arrit++] = R[rit++];
-        }
-    }
-    else if (rit == Rsize) {
-        while (lit < Lsize) {
-            arr[arrit++] = L[lit++];
-        }
-    }
+    temp->prev = cur;
+    cur->next = temp;
     return;
 }
 
-void mergesort(int *arr, int l ,int r){
-    if (l < r) {
-        int mid = (l+r)/2;
-        mergesort(arr, l, mid); mergesort(arr, mid+1, r);
-        merge(arr, l, mid, mid+1, r);
+void printList(node* head) {
+    node* cur = head;
+    while (cur != nullptr) {
+        cout << cur->info << " ";
+        cur = cur->next;
     }
 }
 
 int main() {
-    int n, a; cin >> n;
-    int arr[n];
-    for (int i=0; i<n; i++) {
-        cin >> arr[i]; arr[i] *= arr[i];
+    node *head = nullptr;
+    string i; int j;
+    int numMax = -1, maxFreq = 0, n=0;
+    while (true) {
+        cin >> i;
+        if (i == "#") break;
+        else {
+            j = convert(i);
+            if (head == nullptr) {
+                head = new node();
+                head->info = j; head->next = nullptr; head->prev = nullptr;
+            } else {
+                add(head, j);
+            }
+            n++;
+        }
+    }
+    node *first = head; node *last = head;
+    while (last->next != nullptr) {
+        last = last->next;
+    }
+    int maxSum = INT_MIN;
+    for (int i=0; i<n/2; i++) {
+        int sum = first->info + last->info;
+        maxSum = max(sum, maxSum);
+        first = first->next; last = last->prev;
     }
 
-    mergesort(arr, 0, n-1);
-    for (int i : arr) cout << i << " ";
+    cout << maxSum << "\n";
+    return 0;
+}
+
+//q5, q8
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+int convert(string a) {
+    return stoi(a);
+}
+
+struct node {
+    int info;
+    node* next;
+    // node* prev;
+};
+
+void add(node *head, int data) {
+    node *temp = new node(); node *cur = head;
+    temp->next = nullptr;
+    temp->info = data;
+    while (cur->next != nullptr) {
+        cur = cur->next;
+    }
+    // temp->prev = cur;
+    cur->next = temp;
+    return;
+}
+
+node* reverseList(node *head, node *end) {
+    node *prev = nullptr, *cur = head;
+    while (cur != end) {
+        node *temp = cur->next;
+        cur->next = prev;
+        prev = cur;
+        cur = temp;
+    }
+    return prev; 
+}
+
+void printList(node* head) {
+    node* cur = head;
+    while (cur != nullptr) {
+        cout << cur->info << " ";
+        cur = cur->next;
+    }
+}
+
+int main() {
+    node *head = nullptr;
+    string i;
+    int n = 0;
+    while (cin >> i && i != "#") {
+        int val = stoi(i);
+        if (!head) {
+            head = new node{val, nullptr};
+        } else {
+            add(head, val);
+        }
+        n++;
+    }
+
+    int k; cin >> k; k = k%n;
+
+    head = reverseList(head, nullptr);
+
+    node *mid = head;
+    for (int i = 0; i < k; i++) {
+        mid = mid->next;
+    }
+
+    node* head1 = head; 
+    node* newhead1 = reverseList(head1, mid);
+
+    node* head2 = reverseList(mid, nullptr);
+
+    head1->next = head2; head = newhead1; 
+
+    printList(head);
     cout << "\n";
     return 0;
 }
-//q5
-#include <iostream>
+
+//q6
+#include <bits/stdc++.h>
 using namespace std;
-#define ll long long
+typedef long long ll;
+
+int convert(string a) {
+    return stoi(a);
+}
+
+struct node {
+    int info;
+    node* next;
+    bool visited;
+    // node* prev;
+};
+
+void add(node *head, int data) {
+    node *temp = new node(); node *cur = head;
+    temp->next = nullptr;
+    temp->info = data;
+    while (cur->next != nullptr) {
+        cur = cur->next;
+    }
+    // temp->prev = cur;
+    cur->next = temp; temp->visited = false;
+    return;
+}
+
+void printList(node* head) {
+    node* cur = head;
+    while (cur != nullptr) {
+        cout << cur->info << " ";
+        cur = cur->next;
+    }
+}
 
 int main() {
-    int m, n; cin >> m >> n;
-    int nums1[m+n], nums2[n];
-    for (int &i : nums1) cin >> i;
-    for (int &i : nums2) cin >> i;
-    int r1 = m-1, r2 = n-1, r = n+m-1;
-    while (r1 >= 0 && r2 >= 0) {
-        if (nums1[r1] > nums2[r2]) {
-            nums1[r--] = nums1[r1--];
+    node *head = nullptr;
+    string i;
+    int n = 0;
+    while (cin >> i && i != "#") {
+        int val = stoi(i);
+        if (!head) {
+            head = new node{val, nullptr};
         } else {
-            nums1[r--] = nums2[r2--];
+            add(head, val);
         }
+        n++;
     }
-    if (r1 == -1) {
-        while(r2 >= 0) {
-            nums1[r--] = nums2[r2--];
-        }
+
+    pair<int, int> vals; 
+    for (int i=0; i<n; i++) {
+        cin >> vals.first >> vals.second;
     }
-    if (r2 == -1) {
-        while (r1 >= 0) {
-            nums1[r--] = nums1[r1--];
-        }
+    node *finder = head; node *tail = head;
+    while (finder != nullptr) {
+        if (finder->info == vals.second) {break;}
+        else finder = finder->next;
     }
-    for (int i : nums1) cout << i << " ";
+    while (tail->next != nullptr) {
+        tail = tail->next;
+    }
+    tail->next = finder;
+
+    node *start = nullptr; node *last = nullptr; node *cur = head;
+    int sum = 0;
+    
+    while (cur->next != nullptr) {
+        cur->visited = true;
+        if (cur->next->visited == true) {
+            start = cur->next; last = cur;
+            break;
+        } 
+        cur = cur->next;
+    }
+
+    while (start != last) {
+        sum++; 
+        start = start->next;
+    }
+    cout << ((finder == nullptr) ? 0 : sum + 1);
+    cout << "\n";
     return 0;
 }
 
 //q7
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-#define ll long long
+typedef long long ll;
 
-int main() {
-    int n; cin >> n;
-    int arr[n]; 
-    for (int &i : arr) cin >> i;
-    int cur = arr[0]; int l=1;
-    for (int i=0; i<n; i++) {
-        if (arr[i] != cur) {
-            cur = arr[i]; arr[l++] = cur;
-        }
-    }
-    cout << l << "\n";
-    return 0;
+int convert(string a) {
+    return stoi(a);
 }
 
-//q8
-#include <iostream>
-using namespace std;
-#define ll long long
+struct node {
+    int info;
+    node* next;
+    bool visited;
+    // node* prev;
+};
 
-bool compare (string s1, string s2) {
-    int lenStr = 10;
-    for (int i=6; i<10; i++) {
-        if (s1[i] == s2[i]) continue;
-        else return (s1[i] < s2[i]);
+void add(node *head, int data) {
+    node *temp = new node(); node *cur = head;
+    temp->next = nullptr;
+    temp->info = data;
+    while (cur->next != nullptr) {
+        cur = cur->next;
     }
-    for (int i=3; i<5; i++) {
-        if (s1[i] == s2[i]) continue;
-        else return (s1[i] < s2[i]);
-    }
-    for (int i=0; i<2; i++) {
-        if (s1[i] == s2[i]) continue;
-        else return (s1[i] < s2[i]);
-    }
-    return true;
-}
-
-void merge (string *arr, int l1, int r1, int l2, int r2){
-    int Lsize = r1-l1+1, Rsize = r2-l2+1;
-    string L[Lsize], R[Rsize];
-    for (int i=l1; i<=r1; i++) L[i-l1] = arr[i];
-    for (int i=l2; i<=r2; i++) R[i-l2] = arr[i];
-
-    int lit = 0, rit = 0, arrit = l1;
-    while (lit < Lsize && rit < Rsize) {
-        if (compare(L[lit], R[rit])) {
-            arr[arrit++] = L[lit++];
-        } else {
-            arr[arrit++] = R[rit++];
-        }
-    }
-    if (lit == Lsize) {
-        while (rit < Rsize){
-            arr[arrit++] = R[rit++];
-        }
-    }
-    else if (rit == Rsize) {
-        while (lit < Lsize) {
-            arr[arrit++] = L[lit++];
-        }
-    }
+    // temp->prev = cur;
+    cur->next = temp; temp->visited = false;
     return;
 }
 
-void mergesort(string *arr, int l ,int r){
-    if (l < r) {
-        int mid = (l+r)/2;
-        mergesort(arr, l, mid); mergesort(arr, mid+1, r);
-        merge(arr, l, mid, mid+1, r);
+void printList(node* head) {
+    node* cur = head;
+    while (cur != nullptr) {
+        cout << cur->info << " ";
+        cur = cur->next;
     }
 }
 
 int main() {
-    int n, a; cin >> n;
-    string arr[n];
-    for (string &i: arr) cin >> i;
+    //assuming n >= 2
+    node *head = nullptr;
+    string i;
+    int n = 0;
+    while (cin >> i && i != "#") {
+        int val = stoi(i);
+        if (!head) {
+            head = new node{val, nullptr};
+        } else {
+            add(head, val);
+        }
+        n++;
+    }
 
-    mergesort(arr, 0, n-1);
+    node* headOdd = head; node* headEven = head->next;
+    node* tailOdd = head; node* tailEven = head->next;
 
-    for (string i : arr) cout << i << "\n";
+    while (tailOdd != nullptr && tailEven != nullptr) {
+        tailOdd->next = tailEven->next; tailOdd = tailOdd->next;
+        tailEven->next = tailOdd->next; tailEven = tailEven->next;
+    }
+
+    printList(headOdd);
+    cout << " ";
+    printList(headEven);;
+    cout << "\n";
     return 0;
 }
-
-
 
