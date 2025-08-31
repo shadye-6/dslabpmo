@@ -3,10 +3,6 @@
 using namespace std;
 typedef long long ll;
 
-int convert(string a) {
-    return stoi(a);
-}
-
 struct node {
     int info;
     node* next;
@@ -22,33 +18,43 @@ void add(node *head, int data) {
     cur->next = temp;
 }
 
-void printMiddle (node *head, int n) {
+void printList(node *head) {
     node *cur = head;
-    for (int i=0; i<n/2; i++) {
-        cur = cur->next;
-    }
-    cout << cur->info << "\n";
+    do {
+        cout << cur->info << " ";
+        cur = cur->next; 
+    } while (cur != head);
 }
-
 
 int main() {
     node* head = nullptr;
-    string i; int j, n=0;
-    while (true) {
-        cin >> i;
-        if (i == "#") break;
-        else {
-            j = convert(i);
-            if (n==0) {
-                head = new node();
-                head->info = j; head->next = nullptr;
-            } else {
-            add(head, j);
-            }
-            n++;
+    int i, n=0;
+    int k; cin >> k;
+    while (cin >> i && i != -1) {
+        if (n==0) {
+            head = new node();
+            head->info = i; head->next = nullptr;
+        } else {
+            add(head, i);
         }
+        n++;
     }
-    printMiddle(head, n);
+    k = k%n;
+    //making circular
+    node *cur = head; 
+    while (cur->next != nullptr) {
+        cur = cur->next;
+    }
+    cur->next = head;
+
+    if (k==0) printList(head);
+    else {
+        for (int i=0; i<n-k; i++) {
+            head = head->next;
+        }
+        printList(head);
+    }
+    cout <<"\n";
     return 0;
 }
 
@@ -56,134 +62,6 @@ int main() {
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
-
-int convert(string a) {
-    return stoi(a);
-}
-
-struct node {
-    int info;
-    node* next;
-};
-
-void add(node *head, int data) {
-    node *temp = new node(); node *cur = head;
-    temp->next = nullptr;
-    temp->info = data;
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = temp;
-}
-
-int main() {
-    node* head = nullptr;
-    string i; int j;
-    int numMax = -1, maxFreq = 0;
-    while (true) {
-        cin >> i;
-        if (i == "#") break;
-        else {
-            j = convert(i);
-            if (head == nullptr) {
-                head = new node();
-                head->info = j; head->next = nullptr;
-            } else {
-                add(head, j);
-            }
-        }
-    }
-
-    node *cur = head; int curNum = 0 , curFreq = 0;
-    while (cur != nullptr) {
-        curNum = cur->info;
-        while (cur != nullptr && cur->info == curNum) {
-            curFreq++;
-            cur = cur->next;
-        }
-        if (curFreq == maxFreq) {numMax = max(numMax, curNum);}
-        else if (maxFreq < curFreq){
-            maxFreq = curFreq; numMax = curNum;
-        }
-        curFreq = 0;
-    }
-    cout << numMax << "\n";
-    return 0;
-}
-
-//q3
-#include <bits/stdc++.h>
-using namespace std;
-typedef long long ll;
-
-int convert(string a) {
-    return stoi(a);
-}
-
-struct node {
-    int info;
-    node* next;
-};
-
-void add(node *head, int data) {
-    node *temp = new node(); node *cur = head;
-    temp->next = nullptr;
-    temp->info = data;
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = temp;
-    return;
-}
-
-void printList(node* head) {
-    node* cur = head;
-    while (cur != nullptr) {
-        cout << cur->info << " ";
-        cur = cur->next;
-    }
-}
-
-int main() {
-    node *head = nullptr;
-    string i; int j;
-    int numMax = -1, maxFreq = 0, n=0;
-    while (true) {
-        cin >> i;
-        if (i == "#") break;
-        else {
-            j = convert(i);
-            if (head == nullptr) {
-                head = new node();
-                head->info = j; head->next = nullptr; 
-            } else {
-                add(head, j);
-            }
-            n++;
-        }
-    }
-    node* prev = nullptr; node* cur = head;
-    while (cur != nullptr) {
-        node* temp = cur->next;
-        cur->next = prev;
-        prev = cur;    
-        cur = temp;            
-    }
-    head = prev;
-
-    printList(head);
-    cout << "\n";
-    return 0;
-}
-
-//q4
-#include <bits/stdc++.h>
-using namespace std;
-typedef long long ll;
-
-int convert(string a) {
-    return stoi(a);
-}
 
 struct node {
     int info;
@@ -198,13 +76,25 @@ void add(node *head, int data) {
     while (cur->next != nullptr) {
         cur = cur->next;
     }
-    temp->prev = cur;
     cur->next = temp;
-    return;
+    temp->prev = cur;
 }
 
-void printList(node* head) {
-    node* cur = head;
+void deleteNode(node* &head, node* del) {
+    if (del == head) {
+        head = del->next; free(del);
+    } else if (del->next == nullptr) {
+        node* prev = del->prev;
+        prev->next = nullptr; free(del);
+    } else {
+        node *prev = del->prev; node *next = del->next;
+        prev->next = next; next->prev = prev; free(del);
+    }
+}
+
+void printList(node *head) {
+    node *cur = head;
+    if (cur == nullptr) {cout << -1; return;}
     while (cur != nullptr) {
         cout << cur->info << " ";
         cur = cur->next;
@@ -212,51 +102,42 @@ void printList(node* head) {
 }
 
 int main() {
-    node *head = nullptr;
-    string i; int j;
-    int numMax = -1, maxFreq = 0, n=0;
-    while (true) {
-        cin >> i;
-        if (i == "#") break;
-        else {
-            j = convert(i);
-            if (head == nullptr) {
-                head = new node();
-                head->info = j; head->next = nullptr; head->prev = nullptr;
-            } else {
-                add(head, j);
-            }
-            n++;
+    node* head = nullptr;
+    int i, n=0;
+    int k; cin >> k;
+    while (cin >> i && i != -1) {
+        if (n==0) {
+            head = new node();
+            head->info = i; head->next = nullptr; head->prev = nullptr;
+        } else {
+            add(head, i);
+        }
+        n++;
+    }
+    node *cur = head; 
+    while (cur != nullptr) {
+        if (cur->info == k) {
+            node *temp = cur; cur = cur->next;
+            deleteNode(head, temp);
+        } else {
+            cur = cur->next;
         }
     }
-    node *first = head; node *last = head;
-    while (last->next != nullptr) {
-        last = last->next;
-    }
-    int maxSum = INT_MIN;
-    for (int i=0; i<n/2; i++) {
-        int sum = first->info + last->info;
-        maxSum = max(sum, maxSum);
-        first = first->next; last = last->prev;
-    }
 
-    cout << maxSum << "\n";
+    printList(head);
+    cout <<"\n";
     return 0;
 }
 
-//q5, q8
+/q3
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
 
-int convert(string a) {
-    return stoi(a);
-}
-
 struct node {
     int info;
     node* next;
-    // node* prev;
+    node* prev;
 };
 
 void add(node *head, int data) {
@@ -266,24 +147,13 @@ void add(node *head, int data) {
     while (cur->next != nullptr) {
         cur = cur->next;
     }
-    // temp->prev = cur;
     cur->next = temp;
-    return;
+    temp->prev = cur;
 }
 
-node* reverseList(node *head, node *end) {
-    node *prev = nullptr, *cur = head;
-    while (cur != end) {
-        node *temp = cur->next;
-        cur->next = prev;
-        prev = cur;
-        cur = temp;
-    }
-    return prev; 
-}
-
-void printList(node* head) {
-    node* cur = head;
+void printList(node *head) {
+    node *cur = head;
+    if (cur == nullptr) {cout << -1; return;}
     while (cur != nullptr) {
         cout << cur->info << " ";
         cur = cur->next;
@@ -291,37 +161,128 @@ void printList(node* head) {
 }
 
 int main() {
-    node *head = nullptr;
-    string i;
-    int n = 0;
-    while (cin >> i && i != "#") {
-        int val = stoi(i);
-        if (!head) {
-            head = new node{val, nullptr};
+    node* head1 = nullptr; node *head2 = nullptr; node *head = nullptr;
+    int i, n1 = 0, n2 = 0, n=0;
+    while (cin >> i && i != -1) {
+        if (n1==0) {
+            head1 = new node();
+            head1->info = i; head1->next = nullptr; head1->prev = nullptr;
         } else {
-            add(head, val);
+            add(head1, i);
+        }
+        n1++;
+    }
+    while (cin >> i && i != -1) {
+        if (n2==0) {
+            head2 = new node();
+            head2->info = i; head2->next = nullptr; head2->prev = nullptr;
+        } else {
+            add(head2, i);
+        }
+        n2++;
+    }
+
+    node *cur1 = head1;  node *cur2 = head2; node *cur = nullptr;
+    while (cur1 != nullptr && cur2 != nullptr) {
+        if (cur1->info < cur2->info) {
+            if (n == 0) {
+                head = cur1; cur = head;
+            } else {
+                cur->next = cur1; cur1->prev = cur; cur = cur->next;
+            }
+            cur1 = cur1->next;
+        } else {
+            if (n == 0) {
+                head = cur2; cur = head;
+            } else {
+                cur->next = cur2; cur2->prev = cur; cur = cur->next;
+            }
+            cur2 = cur2->next;
         }
         n++;
     }
-
-    int k; cin >> k; k = k%n;
-
-    head = reverseList(head, nullptr);
-
-    node *mid = head;
-    for (int i = 0; i < k; i++) {
-        mid = mid->next;
+    while (cur1 != nullptr) {
+        cur->next = cur1; cur1->prev = cur;
+        cur = cur->next; cur1 = cur1->next;
     }
 
-    node* head1 = head; 
-    node* newhead1 = reverseList(head1, mid);
+    while (cur2 != nullptr) {
+        cur->next = cur2; cur2->prev = cur;
+        cur = cur->next; cur2 = cur2->next;
+    }
 
-    node* head2 = reverseList(mid, nullptr);
-
-    head1->next = head2; head = newhead1; 
 
     printList(head);
-    cout << "\n";
+    cout <<"\n";
+    return 0;
+}
+
+//q4
+
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+struct node {
+    int info;
+    node* next;
+};
+
+void add(node *head, int data) {
+    node *temp = new node(); node *cur = head;
+    temp->next = nullptr;
+    temp->info = data;
+    while (cur->next != nullptr) {
+        cur = cur->next;
+    }
+    cur->next = temp;
+}
+
+void printList(node *head) {
+    node *cur = head;
+    do {
+        cout << cur->info << " ";
+        cur = cur->next; 
+    } while (cur != head);
+}
+
+int main() {
+    node* head = nullptr;
+    int i, n=0;
+    while (cin >> i && i != -1) {
+        if (n==0) {
+            head = new node();
+            head->info = i; head->next = nullptr;
+        } else {
+            add(head, i);
+        }
+        n++;
+    }
+    //making circular
+    node *cur = head; 
+    while (cur->next != nullptr) {
+        cur = cur->next;
+    }
+    cur->next = head;
+
+    node *head1 = head, *head2 = nullptr;
+    node *cur1 = head, *cur2 = nullptr;
+    cur = head->next;
+
+    for (int j = 1; j < n/2; j++) {
+        cur1->next = cur; cur1 = cur1->next; cur = cur->next;
+    }
+    cur1->next = head1; 
+
+    head2 = cur; cur2 = head2; cur = cur->next;
+    for (int j = 1; j < (n+1)/2; j++) { 
+        cur2->next = cur; cur2 = cur2->next; cur = cur->next;
+    }
+    cur2->next = head2; 
+
+    printList(head1); 
+    cout <<"\n";
+    printList(head2);
     return 0;
 }
 
@@ -330,15 +291,9 @@ int main() {
 using namespace std;
 typedef long long ll;
 
-int convert(string a) {
-    return stoi(a);
-}
-
 struct node {
     int info;
     node* next;
-    bool visited;
-    // node* prev;
 };
 
 void add(node *head, int data) {
@@ -348,65 +303,56 @@ void add(node *head, int data) {
     while (cur->next != nullptr) {
         cur = cur->next;
     }
-    // temp->prev = cur;
-    cur->next = temp; temp->visited = false;
-    return;
+    cur->next = temp;
 }
 
-void printList(node* head) {
-    node* cur = head;
-    while (cur != nullptr) {
-        cout << cur->info << " ";
-        cur = cur->next;
+void deleteNode(node *&head, node *del, node *prev) {
+    if (del == head) {
+        prev->next = del->next;
+        head = del->next; delete del;
+    } else {
+        prev->next = del->next; delete del;
     }
+}
+
+void printList(node *head) {
+    node *cur = head;
+    do {
+        cout << cur->info << " ";
+        cur = cur->next; 
+    } while (cur != head);
 }
 
 int main() {
-    node *head = nullptr;
-    string i;
-    int n = 0;
-    while (cin >> i && i != "#") {
-        int val = stoi(i);
-        if (!head) {
-            head = new node{val, nullptr};
+    node* head = nullptr;
+    int i, n=0;
+    while (cin >> i && i != -1) {
+        if (n==0) {
+            head = new node();
+            head->info = i; head->next = nullptr;
         } else {
-            add(head, val);
+            add(head, i);
         }
         n++;
     }
-
-    pair<int, int> vals; 
-    for (int i=0; i<n; i++) {
-        cin >> vals.first >> vals.second;
-    }
-    node *finder = head; node *tail = head;
-    while (finder != nullptr) {
-        if (finder->info == vals.second) {break;}
-        else finder = finder->next;
-    }
-    while (tail->next != nullptr) {
-        tail = tail->next;
-    }
-    tail->next = finder;
-
-    node *start = nullptr; node *last = nullptr; node *cur = head;
-    int sum = 0;
-    
+    int k; cin >> k;
+    //making circular
+    node *cur = head; 
     while (cur->next != nullptr) {
-        cur->visited = true;
-        if (cur->next->visited == true) {
-            start = cur->next; last = cur;
-            break;
-        } 
         cur = cur->next;
     }
+    cur->next = head;
 
-    while (start != last) {
-        sum++; 
-        start = start->next;
+    node *prev = cur; cur = head;
+    while (cur->next != cur) {
+        for (int i=1; i<k; i++) {
+            cur = cur->next; prev = prev->next;
+        }
+        deleteNode(head, cur, prev);
+        cur = prev->next;
     }
-    cout << ((finder == nullptr) ? 0 : sum + 1);
-    cout << "\n";
+    printList(head);
+    cout <<"\n";
     return 0;
 }
 
@@ -415,64 +361,141 @@ int main() {
 using namespace std;
 typedef long long ll;
 
-int convert(string a) {
-    return stoi(a);
-}
-
 struct node {
+    string name;
     int info;
     node* next;
-    bool visited;
-    // node* prev;
 };
 
-void add(node *head, int data) {
+void add(node *head, string name, int data) {
     node *temp = new node(); node *cur = head;
     temp->next = nullptr;
-    temp->info = data;
+    temp->info = data; temp->name = name;
     while (cur->next != nullptr) {
         cur = cur->next;
     }
-    // temp->prev = cur;
-    cur->next = temp; temp->visited = false;
-    return;
+    cur->next = temp;
 }
 
-void printList(node* head) {
-    node* cur = head;
-    while (cur != nullptr) {
-        cout << cur->info << " ";
-        cur = cur->next;
+string deleteNode(node *&head, node *del, node *prev) {
+    string temp = del->name;
+    if (del == head) {
+        prev->next = del->next;
+        head = del->next; delete del;
+    } else {
+        prev->next = del->next; delete del;
     }
+    return temp;
+}
+
+void printList(node *head) {
+    node *cur = head;
+    do {
+        cout << cur->info << " ";
+        cur = cur->next; 
+    } while (cur != head);
 }
 
 int main() {
-    //assuming n >= 2
-    node *head = nullptr;
-    string i;
-    int n = 0;
-    while (cin >> i && i != "#") {
-        int val = stoi(i);
-        if (!head) {
-            head = new node{val, nullptr};
+    node* head = nullptr;
+    int k; cin >> k;
+    string name; int time;
+    for (int i=0; i<k; i++) {
+        cin >> name >> time;
+        if (i==0) {
+            head = new node();
+            head->name = name; head->info = time; head->next = nullptr;
         } else {
-            add(head, val);
+            add(head, name, time);
         }
-        n++;
+    }
+    //making circular
+    node *cur = head; 
+    while (cur->next != nullptr) {
+        cur = cur->next;
+    }
+    cur->next = head;
+
+    node *prev = cur; cur = head;
+    while (cur->next != cur) {
+        cur->info = cur->info - 5; 
+        if (cur->info < 0) {cout << deleteNode(head, cur, prev) << " "; cur = prev->next;}
+        else {cur = cur->next; prev = prev->next;}
     }
 
-    node* headOdd = head; node* headEven = head->next;
-    node* tailOdd = head; node* tailEven = head->next;
-
-    while (tailOdd != nullptr && tailEven != nullptr) {
-        tailOdd->next = tailEven->next; tailOdd = tailOdd->next;
-        tailEven->next = tailOdd->next; tailEven = tailEven->next;
-    }
-
-    printList(headOdd);
-    cout << " ";
-    printList(headEven);;
-    cout << "\n";
+    cout << head->name;
+    cout <<"\n";
     return 0;
 }
 
+//q8
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+struct node {
+    string name;
+    vector<string> names;
+    node* next;
+    node* prev;
+};
+
+int main() {
+    node *head = nullptr; node *cur = nullptr;
+    int n; cin >> n;
+    bool found = false;
+    string name, a;
+    for (int i=0; i<n; i++) {
+        cin >> name;
+        if (i==0) {
+            head = new node();
+            head->next = nullptr; head->prev = nullptr;
+            head->name = name;
+            while (cin >> a && a != "-1") {
+                head->names.push_back(a);
+            }
+            cur = head;
+        } else {
+            node *temp = new node();
+            temp->next = nullptr; cur->next = temp; temp->prev = cur;
+            temp->name = name;
+            while (cin >> a && a != "-1") {
+                temp->names.push_back(a);
+            }
+            cur = temp;
+        }
+    }
+    string start, person; cin >> start >> person;
+    node *x = head;
+    while (x!= nullptr) {
+        if (x->name == start) {break;}
+        x = x->next;
+    }
+
+    //search forwards
+    node *y = x;
+    while (y!= nullptr) {
+        for (string i : y->names) {
+            if (i == person) {
+                found = true; cout << y->name; break;
+            }
+        }
+        y = y->next;
+    }
+    //search backwards
+    y = x;
+    while (y!=nullptr) {
+        for (string i : y->names) {
+            if (i == person) {
+                found = true; cout << y->name; break;
+            }
+        }
+        y = y->prev;
+    }
+
+    if (!found) cout << -1;
+    cout <<"\n";
+    return 0;
+}
+
+//q5
