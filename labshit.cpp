@@ -3,499 +3,391 @@
 using namespace std;
 typedef long long ll;
 
-struct node {
-    int info;
-    node* next;
-};
+int arr[1002], minVals[1002]; int top = -1, minTop = -1;
 
-void add(node *head, int data) {
-    node *temp = new node(); node *cur = head;
-    temp->next = nullptr;
-    temp->info = data;
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = temp;
+void pushmin(int val) {
+    minTop++; minVals[minTop] = val;
 }
 
-void printList(node *head) {
-    node *cur = head;
-    do {
-        cout << cur->info << " ";
-        cur = cur->next; 
-    } while (cur != head);
+void popmin(){
+    minTop--;
+}
+
+void push(int val) {
+    top++; arr[top] = val;
+    if (minTop == -1 || val <= minVals[minTop]) {
+        pushmin(val);
+    }
+}
+
+int pop() {
+    int val;
+    if (top == -1) {
+        return -101;
+    }
+    if (arr[top] == minVals[minTop]){
+        popmin();
+    }
+    val = arr[top--];
+    return val;
 }
 
 int main() {
-    node* head = nullptr;
-    int i, n=0;
-    int k; cin >> k;
-    while (cin >> i && i != -1) {
-        if (n==0) {
-            head = new node();
-            head->info = i; head->next = nullptr;
-        } else {
-            add(head, i);
+    int n; cin >> n;
+    int type, val;
+    for (int i=0; i<n; i++) {
+        cin >> type; 
+        if (type == 1) {
+            cin >> val; push(val);
+        } else if (type == 2) {
+            val = pop();
+            if (val == -101) cout << "null\n"; 
+            else cout << val << "\n";
+        } else if (type == 3) {
+            if (top == -1) cout << "null\n";
+            else cout << arr[top] << "\n";
+        } else if (type == 4) {
+            if (minTop == -1) cout << "null\n";
+            else cout << minVals[minTop] << "\n";
         }
-        n++;
     }
-    k = k%n;
-    //making circular
-    node *cur = head; 
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = head;
-
-    if (k==0) printList(head);
-    else {
-        for (int i=0; i<n-k; i++) {
-            head = head->next;
-        }
-        printList(head);
-    }
-    cout <<"\n";
     return 0;
 }
 
 //q2
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
 
-struct node {
-    int info;
-    node* next;
-    node* prev;
-};
-
-void add(node *head, int data) {
-    node *temp = new node(); node *cur = head;
-    temp->next = nullptr;
-    temp->info = data;
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = temp;
-    temp->prev = cur;
-}
-
-void deleteNode(node* &head, node* del) {
-    if (del == head) {
-        head = del->next; free(del);
-    } else if (del->next == nullptr) {
-        node* prev = del->prev;
-        prev->next = nullptr; free(del);
-    } else {
-        node *prev = del->prev; node *next = del->next;
-        prev->next = next; next->prev = prev; free(del);
-    }
-}
-
-void printList(node *head) {
-    node *cur = head;
-    if (cur == nullptr) {cout << -1; return;}
-    while (cur != nullptr) {
-        cout << cur->info << " ";
-        cur = cur->next;
-    }
-}
-
-int main() {
-    node* head = nullptr;
-    int i, n=0;
-    int k; cin >> k;
-    while (cin >> i && i != -1) {
-        if (n==0) {
-            head = new node();
-            head->info = i; head->next = nullptr; head->prev = nullptr;
-        } else {
-            add(head, i);
-        }
-        n++;
-    }
-    node *cur = head; 
-    while (cur != nullptr) {
-        if (cur->info == k) {
-            node *temp = cur; cur = cur->next;
-            deleteNode(head, temp);
-        } else {
-            cur = cur->next;
-        }
-    }
-
-    printList(head);
-    cout <<"\n";
+int prec(char op) {
+    if (op == '*' || op == '/') return 2;
+    if (op == '+' || op == '-') return 1;
     return 0;
 }
 
-/q3
+char arr[1001];
+int top = -1;
+
+void push(char c) {
+    arr[++top] = c;
+}
+
+void pop() {
+    if (top >= 0) top--;
+}
+
+char peek() {
+    if (top >= 0) return arr[top];
+    return '\0';
+}
+
+bool empty() {
+    return top == -1;
+}
+
+string infixToPostfix(const string &infix) {
+    string postfix;
+
+    for (char ch : infix) {
+        if (isdigit(ch)) {
+            postfix += ch;
+        } else if (ch == '(') {
+            push(ch);
+        } else if (ch == ')') {
+            while (!empty() && peek() != '(') {
+                postfix += peek();
+                pop();
+            }
+            if (!empty()) pop(); 
+        } else { 
+            while (!empty() && prec(peek()) >= prec(ch)) {
+                if (peek() == '(') break;
+                postfix += peek();
+                pop();
+            }
+            push(ch);
+        }
+    }
+
+    while (!empty()) {
+        postfix += peek();
+        pop();
+    }
+
+    return postfix;
+}
+
+int main() {
+    string infix; cin >> infix;
+    string postfix = infixToPostfix(infix);
+    cout << postfix << "\n";
+    return 0;
+}
+
+//q3
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
 
-struct node {
-    int info;
-    node* next;
-    node* prev;
-};
+int arr[1001]; int top = -1;
 
-void add(node *head, int data) {
-    node *temp = new node(); node *cur = head;
-    temp->next = nullptr;
-    temp->info = data;
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = temp;
-    temp->prev = cur;
+void push(int x) {
+    arr[++top] = x;
 }
 
-void printList(node *head) {
-    node *cur = head;
-    if (cur == nullptr) {cout << -1; return;}
-    while (cur != nullptr) {
-        cout << cur->info << " ";
-        cur = cur->next;
+void pop() {
+    if (top >= 0) top--;
+}
+
+int peek() {
+    if (top >= 0) return arr[top];
+    return INT_MIN; 
+}
+
+bool empty() {
+    return top == -1;
+}
+
+pair<long long, int> evaluatePostfix(const string &postfix) {
+    top = -1; 
+    int maxStackSize = 0;
+
+    for (char ch : postfix) {
+        if (isdigit(ch)) {
+            push(ch - '0'); // convert char to int
+            maxStackSize = max(maxStackSize, top + 1);
+        } else { 
+            if (top < 1) return {LLONG_MIN, maxStackSize};
+            int b = peek(); pop();
+            int a = peek(); pop();
+            long long res = 0;
+
+            switch (ch) {
+                case '+': res = (long long)a + b; break;
+                case '-': res = (long long)a - b; break;
+                case '*': res = (long long)a * b; break;
+                case '/': 
+                    if (b == 0) return {LLONG_MIN, maxStackSize}; 
+                    res = a / b; 
+                    break;
+                default: return {LLONG_MIN, maxStackSize}; 
+            }
+            push(res);
+            maxStackSize = max(maxStackSize, top + 1);
+        }
     }
+
+    if (top != 0) return {LLONG_MIN, maxStackSize}; 
+    return {peek(), maxStackSize};
 }
 
 int main() {
-    node* head1 = nullptr; node *head2 = nullptr; node *head = nullptr;
-    int i, n1 = 0, n2 = 0, n=0;
-    while (cin >> i && i != -1) {
-        if (n1==0) {
-            head1 = new node();
-            head1->info = i; head1->next = nullptr; head1->prev = nullptr;
-        } else {
-            add(head1, i);
-        }
-        n1++;
-    }
-    while (cin >> i && i != -1) {
-        if (n2==0) {
-            head2 = new node();
-            head2->info = i; head2->next = nullptr; head2->prev = nullptr;
-        } else {
-            add(head2, i);
-        }
-        n2++;
-    }
+    string postfix; cin >> postfix;
 
-    node *cur1 = head1;  node *cur2 = head2; node *cur = nullptr;
-    while (cur1 != nullptr && cur2 != nullptr) {
-        if (cur1->info < cur2->info) {
-            if (n == 0) {
-                head = cur1; cur = head;
-            } else {
-                cur->next = cur1; cur1->prev = cur; cur = cur->next;
-            }
-            cur1 = cur1->next;
-        } else {
-            if (n == 0) {
-                head = cur2; cur = head;
-            } else {
-                cur->next = cur2; cur2->prev = cur; cur = cur->next;
-            }
-            cur2 = cur2->next;
-        }
-        n++;
+    auto result = evaluatePostfix(postfix);
+    if (result.first == LLONG_MIN) {
+        cout << "Invalid\n";
+    } else {
+        cout << result.first << "\n";
     }
-    while (cur1 != nullptr) {
-        cur->next = cur1; cur1->prev = cur;
-        cur = cur->next; cur1 = cur1->next;
-    }
+    cout << result.second << "\n";
 
-    while (cur2 != nullptr) {
-        cur->next = cur2; cur2->prev = cur;
-        cur = cur->next; cur2 = cur2->next;
-    }
-
-
-    printList(head);
-    cout <<"\n";
     return 0;
 }
+
 
 //q4
-
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
 
-struct node {
-    int info;
-    node* next;
+const int MAXN = 100001;
+
+// Stack implementation using array
+struct Stack {
+    int arr[MAXN];
+    int top = -1;
+
+    void push(int x) {
+        arr[++top] = x;
+    }
+
+    void pop() {
+        if (top >= 0) top--;
+    }
+
+    int peek() {
+        if (top >= 0) return arr[top];
+        return -1;
+    }
+
+    bool empty() {
+        return top == -1;
+    }
 };
 
-void add(node *head, int data) {
-    node *temp = new node(); node *cur = head;
-    temp->next = nullptr;
-    temp->info = data;
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = temp;
-}
+struct QueueUsingStacks {
+    Stack s1, s2;
 
-void printList(node *head) {
-    node *cur = head;
-    do {
-        cout << cur->info << " ";
-        cur = cur->next; 
-    } while (cur != head);
-}
+    void enqueue(int x) {
+        s1.push(x);
+    }
+
+    int dequeue() {
+        if (s2.empty()) {
+            while (!s1.empty()) {
+                s2.push(s1.peek());
+                s1.pop();
+            }
+        }
+        if (s2.empty()) return -1; 
+        int front = s2.peek();
+        s2.pop();
+        return front;
+    }
+};
 
 int main() {
-    node* head = nullptr;
-    int i, n=0;
-    while (cin >> i && i != -1) {
-        if (n==0) {
-            head = new node();
-            head->info = i; head->next = nullptr;
-        } else {
-            add(head, i);
+    int n;
+    cin >> n;
+
+    QueueUsingStacks q;
+
+    for (int i = 0; i < n; i++) {
+        int op;
+        cin >> op;
+        if (op == 1) {
+            int x;
+            cin >> x;
+            q.enqueue(x);
+        } else if (op == 2) {
+            cout << q.dequeue() << "\n";
         }
-        n++;
     }
-    //making circular
-    node *cur = head; 
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = head;
 
-    node *head1 = head, *head2 = nullptr;
-    node *cur1 = head, *cur2 = nullptr;
-    cur = head->next;
-
-    for (int j = 1; j < n/2; j++) {
-        cur1->next = cur; cur1 = cur1->next; cur = cur->next;
-    }
-    cur1->next = head1; 
-
-    head2 = cur; cur2 = head2; cur = cur->next;
-    for (int j = 1; j < (n+1)/2; j++) { 
-        cur2->next = cur; cur2 = cur2->next; cur = cur->next;
-    }
-    cur2->next = head2; 
-
-    printList(head1); 
-    cout <<"\n";
-    printList(head2);
     return 0;
 }
 
 //q6
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
 
-struct node {
-    int info;
-    node* next;
-};
+const int MAXN = 100001;
+int heap[MAXN];
+int sizeHeap = 0;
 
-void add(node *head, int data) {
-    node *temp = new node(); node *cur = head;
-    temp->next = nullptr;
-    temp->info = data;
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = temp;
-}
+// Swap helper
+void swap(int &a, int &b) { int t = a; a = b; b = t; }
 
-void deleteNode(node *&head, node *del, node *prev) {
-    if (del == head) {
-        prev->next = del->next;
-        head = del->next; delete del;
-    } else {
-        prev->next = del->next; delete del;
+// Heapify up (after insertion)
+void heapifyUp(int idx) {
+    while (idx > 0) {
+        int parent = (idx - 1) / 2;
+        if (heap[parent] <= heap[idx]) break;
+        swap(heap[parent], heap[idx]);
+        idx = parent;
     }
 }
 
-void printList(node *head) {
-    node *cur = head;
-    do {
-        cout << cur->info << " ";
-        cur = cur->next; 
-    } while (cur != head);
+// Heapify down (after removing min)
+void heapifyDown(int idx) {
+    while (true) {
+        int left = 2 * idx + 1;
+        int right = 2 * idx + 2;
+        int smallest = idx;
+
+        if (left < sizeHeap && heap[left] < heap[smallest]) smallest = left;
+        if (right < sizeHeap && heap[right] < heap[smallest]) smallest = right;
+
+        if (smallest == idx) break;
+        swap(heap[idx], heap[smallest]);
+        idx = smallest;
+    }
 }
 
-int main() {
-    node* head = nullptr;
-    int i, n=0;
-    while (cin >> i && i != -1) {
-        if (n==0) {
-            head = new node();
-            head->info = i; head->next = nullptr;
-        } else {
-            add(head, i);
-        }
-        n++;
-    }
-    int k; cin >> k;
-    //making circular
-    node *cur = head; 
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = head;
-
-    node *prev = cur; cur = head;
-    while (cur->next != cur) {
-        for (int i=1; i<k; i++) {
-            cur = cur->next; prev = prev->next;
-        }
-        deleteNode(head, cur, prev);
-        cur = prev->next;
-    }
-    printList(head);
-    cout <<"\n";
-    return 0;
+// Insert element
+void insert(int x) {
+    heap[sizeHeap] = x;
+    heapifyUp(sizeHeap);
+    sizeHeap++;
 }
 
-//q7
-#include <bits/stdc++.h>
-using namespace std;
-typedef long long ll;
-
-struct node {
-    string name;
-    int info;
-    node* next;
-};
-
-void add(node *head, string name, int data) {
-    node *temp = new node(); node *cur = head;
-    temp->next = nullptr;
-    temp->info = data; temp->name = name;
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = temp;
+// Get minimum
+int getMin() {
+    if (sizeHeap == 0) return -1;
+    return heap[0];
 }
 
-string deleteNode(node *&head, node *del, node *prev) {
-    string temp = del->name;
-    if (del == head) {
-        prev->next = del->next;
-        head = del->next; delete del;
-    } else {
-        prev->next = del->next; delete del;
-    }
-    return temp;
-}
-
-void printList(node *head) {
-    node *cur = head;
-    do {
-        cout << cur->info << " ";
-        cur = cur->next; 
-    } while (cur != head);
+// Remove minimum
+void removeMin() {
+    if (sizeHeap == 0) return;
+    heap[0] = heap[sizeHeap - 1];
+    sizeHeap--;
+    heapifyDown(0);
 }
 
 int main() {
-    node* head = nullptr;
-    int k; cin >> k;
-    string name; int time;
-    for (int i=0; i<k; i++) {
-        cin >> name >> time;
-        if (i==0) {
-            head = new node();
-            head->name = name; head->info = time; head->next = nullptr;
-        } else {
-            add(head, name, time);
+    int n;
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        int op;
+        cin >> op;
+
+        if (op == 1) {
+            int m;
+            cin >> m;
+            insert(m);
+        } else if (op == 2) {
+            cout << getMin() << "\n";
+        } else if (op == 3) {
+            removeMin();
         }
     }
-    //making circular
-    node *cur = head; 
-    while (cur->next != nullptr) {
-        cur = cur->next;
-    }
-    cur->next = head;
 
-    node *prev = cur; cur = head;
-    while (cur->next != cur) {
-        cur->info = cur->info - 5; 
-        if (cur->info < 0) {cout << deleteNode(head, cur, prev) << " "; cur = prev->next;}
-        else {cur = cur->next; prev = prev->next;}
-    }
-
-    cout << head->name;
-    cout <<"\n";
     return 0;
 }
 
 //q8
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
 
-struct node {
-    string name;
-    vector<string> names;
-    node* next;
-    node* prev;
-};
+const int MAXN = 100001;
+
+// Array-based stack
+char arr[MAXN];
+int top = -1;
+
+void push(char c) { arr[++top] = c; }
+void pop() { if (top >= 0) top--; }
+char peek() { return top >= 0 ? arr[top] : '\0'; }
+bool empty() { return top == -1; }
+
+// Function to check if two brackets match
+bool isMatching(char open, char close) {
+    return (open == '(' && close == ')') ||
+           (open == '{' && close == '}') ||
+           (open == '[' && close == ']');
+}
+
+string isBalanced(const string &s) {
+    top = -1; // reset stack
+
+    for (char ch : s) {
+        if (ch == '(' || ch == '{' || ch == '[') {
+            push(ch);
+        } else if (ch == ')' || ch == '}' || ch == ']') {
+            if (empty() || !isMatching(peek(), ch)) return "NO";
+            pop();
+        }
+    }
+
+    return empty() ? "YES" : "NO";
+}
 
 int main() {
-    node *head = nullptr; node *cur = nullptr;
-    int n; cin >> n;
-    bool found = false;
-    string name, a;
-    for (int i=0; i<n; i++) {
-        cin >> name;
-        if (i==0) {
-            head = new node();
-            head->next = nullptr; head->prev = nullptr;
-            head->name = name;
-            while (cin >> a && a != "-1") {
-                head->names.push_back(a);
-            }
-            cur = head;
-        } else {
-            node *temp = new node();
-            temp->next = nullptr; cur->next = temp; temp->prev = cur;
-            temp->name = name;
-            while (cin >> a && a != "-1") {
-                temp->names.push_back(a);
-            }
-            cur = temp;
-        }
-    }
-    string start, person; cin >> start >> person;
-    node *x = head;
-    while (x!= nullptr) {
-        if (x->name == start) {break;}
-        x = x->next;
-    }
+    string s;
+    cin >> s;
 
-    //search forwards
-    node *y = x;
-    while (y!= nullptr) {
-        for (string i : y->names) {
-            if (i == person) {
-                found = true; cout << y->name; break;
-            }
-        }
-        y = y->next;
-    }
-    //search backwards
-    y = x;
-    while (y!=nullptr) {
-        for (string i : y->names) {
-            if (i == person) {
-                found = true; cout << y->name; break;
-            }
-        }
-        y = y->prev;
-    }
-
-    if (!found) cout << -1;
-    cout <<"\n";
+    cout << isBalanced(s) << "\n";
     return 0;
 }
 
-//q5
+
