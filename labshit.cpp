@@ -3,172 +3,244 @@
 using namespace std;
 typedef long long ll;
 
-int hashFunction(int key, int m) {
-    return key % m;
-}
-
-void insertKey(int table[], int m, int key) {
-    int i = hashFunction(key, m); int j = i;
-    do {
-        if (table[i] == -1 || table[i] == -2) {
-            table[i] = key;
-            return;
+void dfs(vector<vector<int>> &mx, int i, int n, vector<bool> &visited) {
+    if (!visited[i]) {cout << i << " "; visited[i] = true;}
+    for (int j=0; j<n; j++) {
+        if (mx[i][j] == 1 && !visited[j]) {
+            mx[i][j] = 0; mx[j][i] = 0;
+            dfs(mx, j, n, visited);
         }
-        if (table[i] == key) return;
-        i = (i + 1) % m;
-    } while (i != j);
+    }
 }
-
-void deleteKey(int table[], int m, int key) {
-    int i = hashFunction(key, m);int j = i;
-    do {
-        if (table[i] == -1) return;
-        if (table[i] == key) {
-            table[i] = -2;
-            return;
-        }
-        i = (i + 1) % m;
-    } while (i != j);
-}
-
-bool searchKey(int hashTable[], int tableSize, int key, int &probes) {
-    int i = hashFunction(key, tableSize);int j = i; probes = 0;
-    do {
-        probes++;
-        if (hashTable[i] == -1) return false; 
-        if (hashTable[i] == key) return true;
-        i = (i + 1) % tableSize;
-    } while (i != j);
-    return false;
-}
-
 
 int main() {
-    int m; cin >> m;
-    char s; int key;int table[m]; int probes = 0;
-    for (int i=0; i<m; i++) table[i] = -1;
-    while (true) {
-        cin >> s >> key;
-        if (s == 'I') {
-            insertKey(table, m, key);
-        } else if (s == 'D') {
-            deleteKey(table, m, key);
-        } else if (s == 'S') {
-            if (searchKey(table, m, key, probes)) cout << "found " << probes << "\n";
-            else cout << "not found " << probes << "\n";
-            break;
+    int n; cin >> n;
+    vector<vector<int>> mx(n, vector<int>(n, 0));
+    vector<bool> visited(n, false);    
+    for (int i=0; i<n; i++) {
+        for (int j=0; j<n; j++) cin >> mx[i][j];
+    }
+
+    for (int i=0; i<n; i++) {
+        if (!visited[i]) dfs(mx, i, n, visited);
+    }
+
+    return 0;
+}
+
+//q2
+#include <bits/stdc++.h>
+using namespace std;
+
+typedef long long ll;
+
+void bfs(vector<vector<int>> &gph, int k, vector<bool> &visited) {
+    queue<int> q; q.push(k);
+    visited[k] = true;
+
+    while (!q.empty()) {
+        int tp = q.front();
+        q.pop();
+        cout << tp << " ";
+
+        for (int i : gph[tp]) {
+            if (!visited[i]) {
+                visited[i] = true;
+                q.push(i);
+            }
+        }
+    }
+}
+
+int main() {
+    int n, e; cin >> n >> e;
+    vector<vector<int>> gph(n);
+    vector<bool> visited(n, false);
+    for (int i = 0; i < e; i++) {
+        int a, b; cin >> a >> b;
+        gph[a].push_back(b); gph[b].push_back(a);
+    }
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            bfs(gph, i, visited);
         }
     }
     return 0;
 }
-//q2
-#include <iostream>
+
+//q5
+#include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
 
-struct node {
-    int key;
-    node* next;
-};
-
-int hashFunction(int key, int m) {
-    return key % m;
-}
-
-void insertKey(node* table[], int m, int key) {
-    int i = hashFunction(key, m); node* head = table[i];node* temp = head;
-    while (temp != nullptr) {
-        if (temp->key == key)
-            return;
-        temp = temp->next;
-    }
-    node* newnode = new node;
-    newnode->key = key;newnode->next = head;
-    table[i] = newnode;
-}
-
-void deleteKey(node* table[], int m, int key) {
-    int i = hashFunction(key, m);
-    node* curr = table[i];node* prev = nullptr;
-    while (curr != nullptr) {
-        if (curr->key == key) {
-            if (prev == nullptr) table[i] = curr->next;
-            else prev->next = curr->next;
-            delete curr; return;
+bool dfs(int node, vector<vector<int>> &graph, vector<bool> &visited, vector<bool> &inStack) {
+    visited[node] = true; inStack[node] = true;
+    for (int i : graph[node]) {
+        if (!visited[i]) {
+            if (dfs(i, graph, visited, inStack))
+                return true;
+        } 
+        else if (inStack[i]) {
+            return true;
         }
-        prev = curr; curr = curr->next;
     }
-}
-
-bool searchKey(node* table[], int m, int key) {
-    int i = hashFunction(key, m); node* curr = table[i];
-    while (curr != nullptr) {
-        if (curr->key == key)return true;
-        curr = curr->next;
-    }
+    inStack[node] = false;
     return false;
 }
 
 int main() {
-    int m;cin >> m;
-    node* table[m];
-    for (int i=0; i<m; i++) table[i] = nullptr;
-    char s;int key;
-    while (cin >> s >> key) {
-        if (s == 'I') {
-            insertKey(table, m, key);
-        }  else if (s == 'D') {
-            deleteKey(table, m, key);
-        } else if (s == 'S') {
-            bool found = searchKey(table, m, key);
-            if (found) cout << "Found\n";
-            else cout << "NotFound\n";
-            break;
+    int n, m; cin >> n >> m;
+    vector<vector<int>> graph(n + 1); 
+
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        graph[u].push_back(v);
+    }
+
+    vector<bool> visited(n + 1, false), inStack(n + 1, false);
+    bool hasCycle = false;
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) {
+            if (dfs(i, graph, visited, inStack)) {
+                hasCycle = true;
+                break;
+            }
         }
     }
+    cout << (hasCycle ? "YES" : "NO") << "\n";
     return 0;
 }
 
 //q3
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
 using namespace std;
 
+int m, n;
+
+void dfs(vector<vector<int>> &mx, int i, int j) {
+    if (i < 0 || j < 0 || i >= m || j >= n) return;
+    if (mx[i][j] == 0) return;
+    mx[i][j] = 0;
+    dfs(mx, i + 1, j); dfs(mx, i - 1, j); 
+    dfs(mx, i, j + 1); dfs(mx, i, j - 1); 
+}
+
 int main() {
-    string s; cin >> s;
-    int lastIndex[256];
-    for (int i=0; i <256; i++)lastIndex[i] = -1;
-    int maxsz = 0;int start = 0;
-    for (int i = 0; i<s.length(); ++i) {
-        char c = s[i];
-        if (lastIndex[c] >= start) {
-            start = lastIndex[c]+1;
-        }
-        lastIndex[c] = i; int sz = i-start + 1;
-        if (sz > maxsz) maxsz = sz;
+    cin >> m >> n;
+    vector<vector<int>> mx(m, vector<int>(n));
+    for (int i = 0; i < m; i++) {
+        for (int j=0; j<n; j++) cin >> mx[i][j];
     }
 
-    cout << maxsz << "\n";
+    int count = 0;
+
+    for (int i= 0; i <m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (mx[i][j] == 1) {
+                count++; dfs(mx, i, j);
+            }
+        }
+    }
+    cout << count << "\n";
+    return 0;
+}
+
+//q7
+#include <bits/stdc++.h>
+using namespace std;
+
+void dfs(int node, int parent, int dist, vector<vector<int>> &gph, int &maxd, int &last) {
+    if (dist > maxd) {
+        maxd = dist; last = node;
+    }
+    for (int i : gph[node]) {
+        if (i != parent) {
+            dfs(i, node, dist + 1, gph, maxd, last);
+        }
+    }
+}
+
+int main() {
+    int n, m;cin >> n >> m;
+    vector<vector<int>> gph(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        gph[u].push_back(v); gph[v].push_back(u);
+    }
+    int maxd = -1, last = 1;
+    dfs(1, -1, 0, gph, maxd, last);
+    maxd = -1;
+    dfs(last, -1, 0, gph, maxd, last);
+
+    cout << maxd << "\n"; 
+    return 0;
+}
+//q8
+#include <bits/stdc++.h>
+using namespace std;
+
+bool dfs(int j, int dest, vector<vector<int>> &gph, vector<bool> &visited) {
+    if (j == dest) return true;
+    visited[j] = true;
+    for (int i : gph[j]) {
+        if (!visited[i]) {
+            if (dfs(i, dest, gph, visited))
+                return true;
+        }
+    }
+    return false;
+}
+
+int main() {
+    int n, m; cin >> n >> m;
+    vector<vector<int>> gph(n);
+    for (int i = 0; i < m; i++) {
+        int a, b;cin >> a >> b;
+        gph[a].push_back(b);
+    }
+    int u, v; cin >> u >> v;
+    vector<bool> visited(n, false);
+    bool flag = dfs(u, v, gph, visited);
+    cout << (flag ? "YES" : "NO") << "\n";
     return 0;
 }
 
 //q4
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
 using namespace std;
 
-int main() {
-    string s; cin >> s;
-    int roman[256] = {0}; 
-    roman['I'] = 1; roman['V'] = 5;roman['X'] = 10; roman['L'] = 50; roman['C'] = 100; roman['D'] = 500; roman['M'] = 1000;
-    int n = s.length();int result = 0;
-    for (int i = 0; i < n; ++i) {
-        int curr = roman[(char)s[i]]; int next = 0;
-        if (i+1 < n) next = roman[(char)s[i+1]];
-        if (curr < next)result -= curr;
-        else result += curr;
+bool dfs(int node, int c, vector<vector<int>> &graph, vector<int> &color) {
+    color[node] = c;
+
+    for (int nbr : graph[node]) {
+        if (color[nbr] == -1) {
+            if (!dfs(nbr, 1 - c, graph, color)) return false;
+        } else if (color[nbr] == c) {
+            return false;
+        }
     }
-    cout << result << "\n";
+
+    return true;
+}
+
+int main() {
+    int n, m; cin >> n >> m;
+    vector<vector<int>> graph(n);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v; u--; v--; 
+        graph[u].push_back(v); graph[v].push_back(u);
+    }
+
+    vector<int> color(n, -1); bool flag = true;
+    for (int i = 0; i < n; i++) {
+        if (color[i] == -1) {
+            if (!dfs(i, 0, graph, color)) {
+                flag = false;
+                break;
+            }
+        }
+    }
+    cout << (flag ? "YES" : "NO") << "\n";
     return 0;
 }
-//q5
+//q6
