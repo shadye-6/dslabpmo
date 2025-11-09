@@ -1,246 +1,242 @@
-//q1
-#include <bits/stdc++.h>
-using namespace std;
-typedef long long ll;
+struct PriorityQueue {
+    int heap[100005];
+    int size = 0; 
 
-void dfs(vector<vector<int>> &mx, int i, int n, vector<bool> &visited) {
-    if (!visited[i]) {cout << i << " "; visited[i] = true;}
-    for (int j=0; j<n; j++) {
-        if (mx[i][j] == 1 && !visited[j]) {
-            mx[i][j] = 0; mx[j][i] = 0;
-            dfs(mx, j, n, visited);
+    void heapifyUp(int i) {
+        while (i > 0) {
+            int parent = (i - 1) / 2;
+            if (heap[parent] < heap[i]) {
+                swap(heap[parent], heap[i]);
+                i = parent;
+            } else break;
         }
     }
-}
 
-int main() {
-    int n; cin >> n;
-    vector<vector<int>> mx(n, vector<int>(n, 0));
-    vector<bool> visited(n, false);    
-    for (int i=0; i<n; i++) {
-        for (int j=0; j<n; j++) cin >> mx[i][j];
-    }
+    void heapifyDown(int i) {
+        while (true) {
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+            int largest = i;
 
-    for (int i=0; i<n; i++) {
-        if (!visited[i]) dfs(mx, i, n, visited);
-    }
+            if (left < size && heap[left] > heap[largest]) largest = left;
+            if (right < size && heap[right] > heap[largest]) largest = right;
 
-    return 0;
-}
-
-//q2
-#include <bits/stdc++.h>
-using namespace std;
-
-typedef long long ll;
-
-void bfs(vector<vector<int>> &gph, int k, vector<bool> &visited) {
-    queue<int> q; q.push(k);
-    visited[k] = true;
-
-    while (!q.empty()) {
-        int tp = q.front();
-        q.pop();
-        cout << tp << " ";
-
-        for (int i : gph[tp]) {
-            if (!visited[i]) {
-                visited[i] = true;
-                q.push(i);
-            }
+            if (largest != i) {
+                swap(heap[i], heap[largest]);
+                i = largest;
+            } else break;
         }
     }
-}
 
-int main() {
-    int n, e; cin >> n >> e;
-    vector<vector<int>> gph(n);
-    vector<bool> visited(n, false);
-    for (int i = 0; i < e; i++) {
-        int a, b; cin >> a >> b;
-        gph[a].push_back(b); gph[b].push_back(a);
+    void push(int val) {
+        heap[size] = val;
+        heapifyUp(size);
+        size++;
     }
 
-    for (int i = 0; i < n; i++) {
-        if (!visited[i]) {
-            bfs(gph, i, visited);
+    void pop() {
+        if (size == 0) {
+            cout << "Heap is empty\n";
+            return;
         }
+        heap[0] = heap[size - 1];
+        size--;
+        heapifyDown(0);
     }
-    return 0;
-}
 
-//q5
-#include <bits/stdc++.h>
-using namespace std;
-
-bool dfs(int node, vector<vector<int>> &graph, vector<bool> &visited, vector<bool> &inStack) {
-    visited[node] = true; inStack[node] = true;
-    for (int i : graph[node]) {
-        if (!visited[i]) {
-            if (dfs(i, graph, visited, inStack))
-                return true;
-        } 
-        else if (inStack[i]) {
-            return true;
+    int top() {
+        if (size == 0) {
+            cout << "Heap is empty\n";
+            return -1;
         }
-    }
-    inStack[node] = false;
-    return false;
-}
-
-int main() {
-    int n, m; cin >> n >> m;
-    vector<vector<int>> graph(n + 1); 
-
-    for (int i = 0; i < m; i++) {
-        int u, v; cin >> u >> v;
-        graph[u].push_back(v);
+        return heap[0];
     }
 
-    vector<bool> visited(n + 1, false), inStack(n + 1, false);
-    bool hasCycle = false;
-    for (int i = 1; i <= n; i++) {
-        if (!visited[i]) {
-            if (dfs(i, graph, visited, inStack)) {
-                hasCycle = true;
-                break;
-            }
-        }
+    void printHeap() {
+        for (int i = 0; i < size; i++) cout << heap[i] << " ";
+        cout << "\n";
     }
-    cout << (hasCycle ? "YES" : "NO") << "\n";
-    return 0;
-}
+};
 
-//q3
-#include <bits/stdc++.h>
-using namespace std;
+    // ---------------------- STRUCT DEFINITION ----------------------
+    struct Node {
+        int data;
+        Node* left;
+        Node* right;
+    };
 
-int m, n;
-
-void dfs(vector<vector<int>> &mx, int i, int j) {
-    if (i < 0 || j < 0 || i >= m || j >= n) return;
-    if (mx[i][j] == 0) return;
-    mx[i][j] = 0;
-    dfs(mx, i + 1, j); dfs(mx, i - 1, j); 
-    dfs(mx, i, j + 1); dfs(mx, i, j - 1); 
-}
-
-int main() {
-    cin >> m >> n;
-    vector<vector<int>> mx(m, vector<int>(n));
-    for (int i = 0; i < m; i++) {
-        for (int j=0; j<n; j++) cin >> mx[i][j];
+    // ---------------------- NODE CREATION ----------------------
+    Node* createNode(int value) {
+        Node* newNode = (Node*)malloc(sizeof(Node));
+        newNode->data = value;
+        newNode->left = NULL;
+        newNode->right = NULL;
+        return newNode;
     }
 
-    int count = 0;
+    // ---------------------- INSERTION ----------------------
+    Node* insert(Node* root, int value) {
+        if (root == NULL)
+            return createNode(value);
 
-    for (int i= 0; i <m; i++) {
-        for (int j = 0; j < n; j++) {
-            if (mx[i][j] == 1) {
-                count++; dfs(mx, i, j);
-            }
-        }
+        if (value < root->data)
+            root->left = insert(root->left, value);
+        else if (value > root->data)
+            root->right = insert(root->right, value);
+
+        return root;
     }
-    cout << count << "\n";
-    return 0;
-}
 
-//q7
-#include <bits/stdc++.h>
-using namespace std;
-
-void dfs(int node, int parent, int dist, vector<vector<int>> &gph, int &maxd, int &last) {
-    if (dist > maxd) {
-        maxd = dist; last = node;
-    }
-    for (int i : gph[node]) {
-        if (i != parent) {
-            dfs(i, node, dist + 1, gph, maxd, last);
-        }
-    }
-}
-
-int main() {
-    int n, m;cin >> n >> m;
-    vector<vector<int>> gph(n + 1);
-    for (int i = 0; i < m; i++) {
-        int u, v; cin >> u >> v;
-        gph[u].push_back(v); gph[v].push_back(u);
-    }
-    int maxd = -1, last = 1;
-    dfs(1, -1, 0, gph, maxd, last);
-    maxd = -1;
-    dfs(last, -1, 0, gph, maxd, last);
-
-    cout << maxd << "\n"; 
-    return 0;
-}
-//q8
-#include <bits/stdc++.h>
-using namespace std;
-
-bool dfs(int j, int dest, vector<vector<int>> &gph, vector<bool> &visited) {
-    if (j == dest) return true;
-    visited[j] = true;
-    for (int i : gph[j]) {
-        if (!visited[i]) {
-            if (dfs(i, dest, gph, visited))
-                return true;
-        }
-    }
-    return false;
-}
-
-int main() {
-    int n, m; cin >> n >> m;
-    vector<vector<int>> gph(n);
-    for (int i = 0; i < m; i++) {
-        int a, b;cin >> a >> b;
-        gph[a].push_back(b);
-    }
-    int u, v; cin >> u >> v;
-    vector<bool> visited(n, false);
-    bool flag = dfs(u, v, gph, visited);
-    cout << (flag ? "YES" : "NO") << "\n";
-    return 0;
-}
-
-//q4
-#include <bits/stdc++.h>
-using namespace std;
-
-bool dfs(int node, int c, vector<vector<int>> &graph, vector<int> &color) {
-    color[node] = c;
-
-    for (int nbr : graph[node]) {
-        if (color[nbr] == -1) {
-            if (!dfs(nbr, 1 - c, graph, color)) return false;
-        } else if (color[nbr] == c) {
+    // ---------------------- SEARCH ----------------------
+    bool search(Node* root, int key) {
+        if (root == NULL)
             return false;
-        }
+        if (root->data == key)
+            return true;
+        else if (key < root->data)
+            return search(root->left, key);
+        else
+            return search(root->right, key);
     }
 
-    return true;
+    // ---------------------- FIND MINIMUM ----------------------
+    Node* findMin(Node* root) {
+        while (root && root->left != NULL)
+            root = root->left;
+        return root;
+    }
+
+    // ---------------------- DELETE NODE ----------------------
+    Node* deleteNode(Node* root, int key) {
+        if (root == NULL)
+            return NULL;
+
+        if (key < root->data)
+            root->left = deleteNode(root->left, key);
+        else if (key > root->data)
+            root->right = deleteNode(root->right, key);
+        else {
+            // Node found
+            if (root->left == NULL) {
+                Node* temp = root->right;
+                free(root);
+                return temp;
+            } else if (root->right == NULL) {
+                Node* temp = root->left;
+                free(root);
+                return temp;
+            }
+
+            // Node with two children: replace with inorder successor
+            Node* temp = findMin(root->right);
+            root->data = temp->data;
+            root->right = deleteNode(root->right, temp->data);
+        }
+        return root;
+    }
+
+int queue[MAX];
+int front = -1, rear = -1;
+
+bool isFull() {
+    return (front == 0 && rear == MAX - 1) || (rear + 1 == front);
 }
 
-int main() {
-    int n, m; cin >> n >> m;
-    vector<vector<int>> graph(n);
-    for (int i = 0; i < m; i++) {
-        int u, v; cin >> u >> v; u--; v--; 
-        graph[u].push_back(v); graph[v].push_back(u);
+bool isEmpty() {
+    return front == -1;
+}
+
+void enqueue(int value) {
+    if (isFull()) {
+        cout << "Queue Overflow\n";
+        return;
     }
 
-    vector<int> color(n, -1); bool flag = true;
-    for (int i = 0; i < n; i++) {
-        if (color[i] == -1) {
-            if (!dfs(i, 0, graph, color)) {
-                flag = false;
-                break;
+    if (front == -1) front = 0;  // first element
+    rear = (rear + 1) % MAX;
+    queue[rear] = value;
+    cout << value << " enqueued.\n";
+}
+
+void dequeue() {
+    if (isEmpty()) {
+        cout << "Queue Underflow\n";
+        return;
+    }
+
+    int value = queue[front];
+    if (front == rear) {  // only one element
+        front = rear = -1;
+    } else {
+        front = (front + 1) % MAX;
+    }
+
+    cout << value << " dequeued.\n";
+}
+
+void display() {
+    if (isEmpty()) {
+        cout << "Queue is empty.\n";
+        return;
+    }
+
+    cout << "Queue: ";
+    int i = front;
+    while (true) {
+        cout << queue[i] << " ";
+        if (i == rear) break;
+        i = (i + 1) % MAX;
+    }
+    cout << "\n";
+}
+// ---------------------- DFS USING STACK ----------------------
+void DFS(int graph[MAX][MAX], int n, int start) {
+    int visited[MAX] = {0};
+    Stack s;
+    initStack(s);
+
+    push(s, start);
+    visited[start] = 1;
+
+    cout << "DFS Traversal: ";
+
+    while (!isEmpty(s)) {
+        int node = pop(s);
+        cout << node << " ";
+
+        // push unvisited adjacent nodes
+        for (int i = n - 1; i >= 0; i--) { // reverse order for consistent output
+            if (graph[node][i] == 1 && !visited[i]) {
+                push(s, i);
+                visited[i] = 1;
             }
         }
     }
-    cout << (flag ? "YES" : "NO") << "\n";
-    return 0;
+    cout << "\n";
 }
-//q6
+
+// ---------------------- BFS USING QUEUE ----------------------
+void BFS(int graph[MAX][MAX], int n, int start) {
+    int visited[MAX] = {0};
+    Queue q;
+    initQueue(q);
+
+    enqueue(q, start);
+    visited[start] = 1;
+
+    cout << "BFS Traversal: ";
+
+    while (!isQEmpty(q)) {
+        int node = dequeue(q);
+        cout << node << " ";
+
+        // enqueue unvisited adjacent nodes
+        for (int i = 0; i < n; i++) {
+            if (graph[node][i] == 1 && !visited[i]) {
+                enqueue(q, i);
+                visited[i] = 1;
+            }
+        }
+    }
+    cout << "\n";
+}
