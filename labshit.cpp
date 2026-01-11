@@ -1,242 +1,140 @@
-struct PriorityQueue {
-    int heap[100005];
-    int size = 0; 
+#include <bits/stdc++.h>
+#include <fstream>
+using namespace std;
+using ll = long long;
+#define pb push_back 
+#define fi first
+#define se second
+#define vint vector<int> 
+#define vll vector<ll>
+#define vin(arr, n)vint arr(n);for(int i=0;i<(n);i++)cin>>arr[i];
+#define vout(arr) do{for (auto i:(arr))cout<<i<<" ";cout << "\n";}while(0)
 
-    void heapifyUp(int i) {
-        while (i > 0) {
-            int parent = (i - 1) / 2;
-            if (heap[parent] < heap[i]) {
-                swap(heap[parent], heap[i]);
-                i = parent;
-            } else break;
-        }
-    }
-
-    void heapifyDown(int i) {
-        while (true) {
-            int left = 2 * i + 1;
-            int right = 2 * i + 2;
-            int largest = i;
-
-            if (left < size && heap[left] > heap[largest]) largest = left;
-            if (right < size && heap[right] > heap[largest]) largest = right;
-
-            if (largest != i) {
-                swap(heap[i], heap[largest]);
-                i = largest;
-            } else break;
-        }
-    }
-
-    void push(int val) {
-        heap[size] = val;
-        heapifyUp(size);
-        size++;
-    }
-
-    void pop() {
-        if (size == 0) {
-            cout << "Heap is empty\n";
-            return;
-        }
-        heap[0] = heap[size - 1];
-        size--;
-        heapifyDown(0);
-    }
-
-    int top() {
-        if (size == 0) {
-            cout << "Heap is empty\n";
-            return -1;
-        }
-        return heap[0];
-    }
-
-    void printHeap() {
-        for (int i = 0; i < size; i++) cout << heap[i] << " ";
-        cout << "\n";
-    }
+struct node {
+    int data;
+    node* left;
+    node* right;
 };
 
-    // ---------------------- STRUCT DEFINITION ----------------------
-    struct Node {
-        int data;
-        Node* left;
-        Node* right;
-    };
-
-    // ---------------------- NODE CREATION ----------------------
-    Node* createNode(int value) {
-        Node* newNode = (Node*)malloc(sizeof(Node));
-        newNode->data = value;
-        newNode->left = NULL;
-        newNode->right = NULL;
-        return newNode;
-    }
-
-    // ---------------------- INSERTION ----------------------
-    Node* insert(Node* root, int value) {
-        if (root == NULL)
-            return createNode(value);
-
-        if (value < root->data)
-            root->left = insert(root->left, value);
-        else if (value > root->data)
-            root->right = insert(root->right, value);
-
-        return root;
-    }
-
-    // ---------------------- SEARCH ----------------------
-    bool search(Node* root, int key) {
-        if (root == NULL)
-            return false;
-        if (root->data == key)
-            return true;
-        else if (key < root->data)
-            return search(root->left, key);
-        else
-            return search(root->right, key);
-    }
-
-    // ---------------------- FIND MINIMUM ----------------------
-    Node* findMin(Node* root) {
-        while (root && root->left != NULL)
-            root = root->left;
-        return root;
-    }
-
-    // ---------------------- DELETE NODE ----------------------
-    Node* deleteNode(Node* root, int key) {
-        if (root == NULL)
-            return NULL;
-
-        if (key < root->data)
-            root->left = deleteNode(root->left, key);
-        else if (key > root->data)
-            root->right = deleteNode(root->right, key);
-        else {
-            // Node found
-            if (root->left == NULL) {
-                Node* temp = root->right;
-                free(root);
-                return temp;
-            } else if (root->right == NULL) {
-                Node* temp = root->left;
-                free(root);
-                return temp;
-            }
-
-            // Node with two children: replace with inorder successor
-            Node* temp = findMin(root->right);
-            root->data = temp->data;
-            root->right = deleteNode(root->right, temp->data);
-        }
-        return root;
-    }
-
-int queue[MAX];
-int front = -1, rear = -1;
-
-bool isFull() {
-    return (front == 0 && rear == MAX - 1) || (rear + 1 == front);
+node* createNode(int val) {
+    node* temp = new node;
+    temp->left = nullptr;
+    temp->right = nullptr;
+    temp->data = val;
+    return temp;
 }
 
-bool isEmpty() {
-    return front == -1;
-}
-
-void enqueue(int value) {
-    if (isFull()) {
-        cout << "Queue Overflow\n";
-        return;
+node* insertNode(node *cur, int val) {
+    if (cur == nullptr) {
+        return createNode(val);
     }
-
-    if (front == -1) front = 0;  // first element
-    rear = (rear + 1) % MAX;
-    queue[rear] = value;
-    cout << value << " enqueued.\n";
-}
-
-void dequeue() {
-    if (isEmpty()) {
-        cout << "Queue Underflow\n";
-        return;
-    }
-
-    int value = queue[front];
-    if (front == rear) {  // only one element
-        front = rear = -1;
+    if (val < cur->data) {
+        cur->left = insertNode(cur->left, val);
     } else {
-        front = (front + 1) % MAX;
+        cur->right = insertNode(cur->right, val);
     }
-
-    cout << value << " dequeued.\n";
+    return cur;
 }
 
-void display() {
-    if (isEmpty()) {
-        cout << "Queue is empty.\n";
-        return;
+bool search(node* cur, int val) {
+    if (cur == nullptr) return false;
+    if (cur->data == val) return true;
+    if (val < cur->data) {
+        return search(cur->left, val);
+    } else {
+        return search(cur->right, val);
     }
-
-    cout << "Queue: ";
-    int i = front;
-    while (true) {
-        cout << queue[i] << " ";
-        if (i == rear) break;
-        i = (i + 1) % MAX;
-    }
-    cout << "\n";
 }
-// ---------------------- DFS USING STACK ----------------------
-void DFS(int graph[MAX][MAX], int n, int start) {
-    int visited[MAX] = {0};
-    Stack s;
-    initStack(s);
 
-    push(s, start);
-    visited[start] = 1;
+node* findMin(node* cur) {
+    while (cur && cur->left != nullptr) {
+        cur = cur->left;
+    }
+    return cur;
+}
 
-    cout << "DFS Traversal: ";
+node* findMax(node* cur) {
+    while (cur && cur->right != nullptr) {
+        cur = cur->right;
+    }
+    return cur;
+}
 
-    while (!isEmpty(s)) {
-        int node = pop(s);
-        cout << node << " ";
-
-        // push unvisited adjacent nodes
-        for (int i = n - 1; i >= 0; i--) { // reverse order for consistent output
-            if (graph[node][i] == 1 && !visited[i]) {
-                push(s, i);
-                visited[i] = 1;
-            }
+node* deleteNode(node* cur, int val) {
+    if (cur == nullptr) {return cur;}
+    if (val < cur->data) {
+        cur->left = deleteNode(cur->left, val);
+    } else if (val > cur->data) {
+        cur->right = deleteNode(cur->right, val);
+    } else {
+        if (cur->left == nullptr) {
+            node* temp = cur->right;
+            delete cur;
+            return temp;
+        } else if (cur->right == nullptr) {
+            node* temp = cur->left;
+            delete cur;
+            return temp;
+        } else {
+            node* temp = findMin(cur->right);
+            cur->data = temp->data;
+            cur->right = deleteNode(cur->right, temp->data);
         }
     }
-    cout << "\n";
+    return cur;
 }
 
-// ---------------------- BFS USING QUEUE ----------------------
-void BFS(int graph[MAX][MAX], int n, int start) {
-    int visited[MAX] = {0};
-    Queue q;
-    initQueue(q);
+void pre(node* cur) {
+    if (cur == nullptr) return;
+    cout << cur->data << " ";
+    pre(cur->left);
+    pre(cur->right);
+}
 
-    enqueue(q, start);
-    visited[start] = 1;
+void post(node* cur) {
+    if (cur == nullptr) return;
+    post(cur->left);
+    post(cur->right);
+    cout << cur->data << " ";
+}
 
-    cout << "BFS Traversal: ";
+void inord(node* cur) {
+    if (cur == nullptr) return;
+    inord(cur->left);
+    cout << cur->data << " ";
+    inord(cur->right);
+}
 
-    while (!isQEmpty(q)) {
-        int node = dequeue(q);
-        cout << node << " ";
 
-        // enqueue unvisited adjacent nodes
-        for (int i = 0; i < n; i++) {
-            if (graph[node][i] == 1 && !visited[i]) {
-                enqueue(q, i);
-                visited[i] = 1;
-            }
-        }
+int main() {
+    ofstream file;
+    file.open("name.txt");
+    file << "text to be written\n";
+    file.close();
+
+    //line by line
+    ifstream file2;
+    file2.open("name.txt");
+    string line;
+    while(getline(file2, line)) {
+        cout << line << endl;
     }
-    cout << "\n";
+    file2.close();
+
+    //word by word
+    ifstream file3;
+    file3.open("name.txt");
+    string word;
+    while (file3 >> word) {
+        cout << word << "\n";
+    }
+    file3.close();
+    // Mode	Meaning
+    // ios::in	Read
+    // ios::out	Write
+    // ios::app	Append ofstream file("data.txt", ios::app);
+    // ios::ate	Start at end
+    // ios::trunc	Clear file
+    // ios::binary	Binary mode
+    // fstream file("data.txt", ios::in | ios::out);
 }
