@@ -10,103 +10,36 @@ using ll = long long;
 #define vin(arr, n)vint arr(n);for(int i=0;i<(n);i++)cin>>arr[i];
 #define vout(arr) do{for (auto i:(arr))cout<<i<<" ";cout << "\n";}while(0)
 
-struct node {
-    int data;
-    node* left;
-    node* right;
-};
-
-node* createNode(int val) {
-    node* temp = new node;
-    temp->left = nullptr;
-    temp->right = nullptr;
-    temp->data = val;
-    return temp;
-}
-
-node* insertNode(node *cur, int val) {
-    if (cur == nullptr) {
-        return createNode(val);
-    }
-    if (val < cur->data) {
-        cur->left = insertNode(cur->left, val);
-    } else {
-        cur->right = insertNode(cur->right, val);
-    }
-    return cur;
-}
-
-bool search(node* cur, int val) {
-    if (cur == nullptr) return false;
-    if (cur->data == val) return true;
-    if (val < cur->data) {
-        return search(cur->left, val);
-    } else {
-        return search(cur->right, val);
-    }
-}
-
-node* findMin(node* cur) {
-    while (cur && cur->left != nullptr) {
-        cur = cur->left;
-    }
-    return cur;
-}
-
-node* findMax(node* cur) {
-    while (cur && cur->right != nullptr) {
-        cur = cur->right;
-    }
-    return cur;
-}
-
-node* deleteNode(node* cur, int val) {
-    if (cur == nullptr) {return cur;}
-    if (val < cur->data) {
-        cur->left = deleteNode(cur->left, val);
-    } else if (val > cur->data) {
-        cur->right = deleteNode(cur->right, val);
-    } else {
-        if (cur->left == nullptr) {
-            node* temp = cur->right;
-            delete cur;
-            return temp;
-        } else if (cur->right == nullptr) {
-            node* temp = cur->left;
-            delete cur;
-            return temp;
-        } else {
-            node* temp = findMin(cur->right);
-            cur->data = temp->data;
-            cur->right = deleteNode(cur->right, temp->data);
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1;
+    for (int j = low; j < high; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            swap(arr[i], arr[j]);
         }
     }
-    return cur;
+
+    swap(arr[i+1], arr[high]);
+    return i+1;
 }
 
-void pre(node* cur) {
-    if (cur == nullptr) return;
-    cout << cur->data << " ";
-    pre(cur->left);
-    pre(cur->right);
+int randomPartition(int arr[], int low, int high) {
+    int randint = low + rand() % (high - low + 1);
+    swap(arr[randint], arr[high]);  
+    return partition(arr, low, high);
 }
 
-void post(node* cur) {
-    if (cur == nullptr) return;
-    post(cur->left);
-    post(cur->right);
-    cout << cur->data << " ";
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        int pi = randomPartition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
 }
-
-void inord(node* cur) {
-    if (cur == nullptr) return;
-    inord(cur->left);
-    cout << cur->data << " ";
-    inord(cur->right);
-}
-
 
 int main() {
+    srand(time(0));
     ofstream file;
     file.open("name.txt");
     file << "text to be written\n";
@@ -137,4 +70,26 @@ int main() {
     // ios::trunc	Clear file
     // ios::binary	Binary mode
     // fstream file("data.txt", ios::in | ios::out);
+
+    //for csv 
+    
+    // int id;
+    // string name;
+    // float score;
+    
+    // string line;
+    // while (getline(file, line)) {
+    //     stringstream ss(line);
+    //     string temp;
+    
+    //     getline(ss, temp, ',');
+    //     id = stoi(temp);
+    
+    //     getline(ss, name, ',');
+    
+    //     getline(ss, temp, ',');
+    //     score = stof(temp);
+    
+    //     cout << id << " " << name << " " << score << endl;
+    // }
 }
