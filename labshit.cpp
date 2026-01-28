@@ -38,6 +38,131 @@ void quickSort(int arr[], int low, int high) {
     }
 }
 
+/* ===================== MERGESORT ===================== */
+
+void merge(vector<int>& arr, int left, int mid, int right)
+{
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    vector<int> L(n1), R(n2);
+
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
+
+    int i = 0, j = 0, k = left;
+
+    while (i < n1 && j < n2)
+        arr[k++] = (L[i] <= R[j]) ? L[i++] : R[j++];
+
+    while (i < n1)
+        arr[k++] = L[i++];
+
+    while (j < n2)
+        arr[k++] = R[j++];
+}
+
+void mergeSort(vector<int>& arr, int left, int right)
+{
+    if (left < right)
+    {
+        int mid = left + (right - left) / 2;
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+}
+
+/* ===================== COUNTING SORT ===================== */
+
+void countingSort(vector<int>& arr)
+{
+    if (arr.empty()) return;
+
+    int maxVal = *max_element(arr.begin(), arr.end());
+    int minVal = *min_element(arr.begin(), arr.end());
+
+    int range = maxVal - minVal + 1;
+    vector<int> count(range, 0);
+
+    for (int num : arr)
+        count[num - minVal]++;
+
+    int index = 0;
+    for (int i = 0; i < range; i++)
+        while (count[i]--)
+            arr[index++] = i + minVal;
+}
+
+/* ===================== RADIX SORT ===================== */
+
+int getMax(const vector<int>& arr)
+{
+    return *max_element(arr.begin(), arr.end());
+}
+
+void countingSortRadix(vector<int>& arr, int exp)
+{
+    int n = arr.size();
+    vector<int> output(n);
+    int count[10] = {0};
+
+    for (int i = 0; i < n; i++)
+        count[(arr[i] / exp) % 10]++;
+
+    for (int i = 1; i < 10; i++)
+        count[i] += count[i - 1];
+
+    for (int i = n - 1; i >= 0; i--)
+    {
+        int digit = (arr[i] / exp) % 10;
+        output[count[digit] - 1] = arr[i];
+        count[digit]--;
+    }
+
+    arr = output;
+}
+
+void radixSort(vector<int>& arr)
+{
+    int maxVal = getMax(arr);
+
+    for (int exp = 1; maxVal / exp > 0; exp *= 10)
+        countingSortRadix(arr, exp);
+}
+
+/* ===================== BUCKET SORT ===================== */
+
+void bucketSort(vector<int>& arr)
+{
+    if (arr.empty()) return;
+
+    int maxVal = *max_element(arr.begin(), arr.end());
+    int minVal = *min_element(arr.begin(), arr.end());
+
+    int bucketCount = sqrt(arr.size());
+    vector<vector<int>> buckets(bucketCount);
+
+    double range = (double)(maxVal - minVal + 1) / bucketCount;
+
+    for (int num : arr)
+    {
+        int index = (int)((num - minVal) / range);
+        if (index == bucketCount) index--;
+        buckets[index].push_back(num);
+    }
+
+    arr.clear();
+    for (auto& bucket : buckets)
+    {
+        sort(bucket.begin(), bucket.end());
+        for (int num : bucket)
+            arr.push_back(num);
+    }
+}
+
 int main() {
     srand(time(0));
     ofstream file;
